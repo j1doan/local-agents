@@ -1,0 +1,35 @@
+{
+  "model": "gemma-4-E2B_q4_0-it.gguf",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant. You have access to tools — use them whenever relevant to the user's request. Always call a tool if one matches the task. Do not claim you cannot use tools. When a tool call is needed, respond ONLY with the tool call, no extra text before or after."
+    },
+    {
+      "role": "user",
+      "content": "What is the weather in Paris right now?"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a given city",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "The city name"
+            }
+          },
+          "required": ["city"]
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto",
+  "temperature": 1.0,
+  "max_tokens": 512
+}

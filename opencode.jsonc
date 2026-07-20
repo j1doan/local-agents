@@ -1,0 +1,23 @@
+// Put this in `~.config/opencode/opencode.jsonc`
+
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "llama.cpp": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llama.cpp",
+      "options": {
+        "baseURL": "http://127.0.0.1:8080/v1"
+      },
+      "models": {
+        "local-model": {
+          "name": "llama-server.exe",
+          "limit": {
+            "context": 128000,
+            "output": 128000
+          }
+        }
+      }
+    }
+  }
+}
