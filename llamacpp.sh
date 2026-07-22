@@ -2,17 +2,37 @@
 
 ### BEFORE FIRST RUN: `chmod +x llamacpp.sh`
 
-cd /c/llama.cpp || exit 1
+case "$(uname -r)" in
+    *microsoft*|*Microsoft*)
+        WIN_ROOT="/mnt/c"
+        USE_WSL=1
+        ;;
+    *)
+        WIN_ROOT="/c"
+        USE_WSL=0
+        ;;
+esac
 
-MODELS_DIR="/c/models"
-PRESETS_FILE="$(dirname "$0")/models.ini"
+PRESETS_FILE="$(cd "$(dirname "$0")" && pwd)/models.ini"
+MODELS_DIR="$WIN_ROOT/models"
+
+if [[ "$USE_WSL" -eq 1 ]]; then
+    WIN_PRESETS_FILE="$(wslpath -w "$PRESETS_FILE")"
+    WIN_MODELS_DIR="$(wslpath -w "$MODELS_DIR")"
+else
+    WIN_PRESETS_FILE="$PRESETS_FILE"
+    WIN_MODELS_DIR="$MODELS_DIR"
+fi
+
+cd "$WIN_ROOT/llama.cpp" || exit 1
+
 SERVER_ARGS=(
     --host 127.0.0.1
     --port 8080
     --poll 100
     --prio 2
     --models-max 2
-    --models-preset "$PRESETS_FILE"
+    --models-preset "$WIN_PRESETS_FILE"
 )
 
 TOOL_SYSTEM_PROMPT="You are a helpful assistant. You have access to tools — use them whenever relevant to the user's request. Always call a tool if one matches the task. Do not claim you cannot use tools. When a tool call is needed, respond ONLY with the tool call, no extra text before or after."
@@ -36,7 +56,7 @@ read -rp "Select an option (1-2): " choice
 case "$choice" in
     1)
         echo "Starting llama-server in router mode..."
-        echo "Presets file:    $PRESETS_FILE"
+        echo "Presets file:    $WIN_PRESETS_FILE"
         echo "Max loaded models: 2"
         echo "Tool calling: ENABLED (reasoning-budget=0, jinja=on)"
         echo
@@ -67,7 +87,7 @@ case "$choice" in
 
         echo "Waiting for llama.cpp server..."
         sleep 10
-        start http://127.0.0.1:8080
+        cmd.exe /c start http://127.0.0.1:8080
         echo "Llama server running at http://127.0.0.1:8080/v1"
         wait
         ;;
@@ -89,7 +109,7 @@ case "$choice" in
 
         read -rp "Select model (1-${#GGUF_FILES[@]}): " idx
         [[ "$idx" =~ ^[0-9]+$ && idx -ge 1 && idx -le ${#GGUF_FILES[@]} ]] || { echo "Invalid selection."; exit 1; }
-        BENCH_MODEL="$MODELS_DIR/${GGUF_FILES[$((idx - 1))]}"
+        BENCH_MODEL="$WIN_MODELS_DIR/${GGUF_FILES[$((idx - 1))]}"
 
         echo
         read -rp "GPU layers (0=CPU only, 999=all): " ngl
