@@ -1,7 +1,7 @@
 # Local AI Setup Using Llama.cpp
 
 > [!WARNING]
-> This is **not** documentation. This is a memory aid for an idiot (me) because I have the memory of a goldfish.
+> This is **not** documentation. This is a memory aid for an idiot (me).
 >
 > If you're here because Google brought you here (how that's possible is beyond me), do yourself a favor and read the official documentation instead.
 
