@@ -2,6 +2,7 @@
 
 ### BEFORE FIRST RUN: `chmod +x llamacpp.sh`
 
+### cd /c -> /d if models are stored on another drive
 case "$(uname -r)" in
     *microsoft*|*Microsoft*)
         WIN_ROOT="/mnt/c"
@@ -14,7 +15,7 @@ case "$(uname -r)" in
 esac
 
 PRESETS_FILE="$(cd "$(dirname "$0")" && pwd)/models.ini"
-MODELS_DIR="$WIN_ROOT/models"
+MODELS_DIR="$WIN_ROOT/huggingface"
 
 if [[ "$USE_WSL" -eq 1 ]]; then
     WIN_PRESETS_FILE="$(wslpath -w "$PRESETS_FILE")"
@@ -24,7 +25,8 @@ else
     WIN_MODELS_DIR="$MODELS_DIR"
 fi
 
-cd "$WIN_ROOT/llama.cpp" || exit 1
+### TODO: rename llama.cpp -> llamacpp-bXXXX based on build ver
+cd "$WIN_ROOT/llamacpp-bXXXXX" || exit 1
 
 SERVER_ARGS=(
     --host 127.0.0.1
