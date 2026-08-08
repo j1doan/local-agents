@@ -10,7 +10,7 @@
         Run 'cmd.exe /c start http://127.0.0.1:8080'
         return
     }
-    Run 'C:\llama.cpp\llama-server.exe --host 127.0.0.1 --port 8080 --poll 100 --prio 2 --models-max 2 --models-preset C:\llama.cpp\localhost\models.ini', 'C:\llama.cpp'
+    Run 'cmd.exe /k wsl.exe -i -c "cd /d/llamacpp-bXXXXX/localhost && ./llamacpp.sh"', 'D:\llamacpp-b10250'
     Sleep 10000
     Run 'cmd.exe /c start http://127.0.0.1:8080'
 }
