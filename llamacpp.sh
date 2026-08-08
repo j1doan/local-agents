@@ -131,18 +131,18 @@ case "$choice" in
         echo "  ngl=$ngl  pp=$pp  tg=$tg  reps=$reps"
         echo
         ./llama-bench.exe \
-            --model "$( [ "$USE_WSL" -eq 1 ] && wslpath -w "$BENCH_MODEL" || echo "$BENCH_MODEL" )" \
-            --ngl "$ngl" \
-            --threads 4 \
-            --batch-size 2048 \
-            --ubatch-size 512 \
-            --flash-attn auto \
-            --cache-type-k q8_0 \
-            --cache-type-v q8_0 \
-            --prompt "$pp" \
-            --generate-tokens "$tg" \
-            --repetitions "$reps" \
-            --output md \
+            -m "$( [ "$USE_WSL" -eq 1 ] && wslpath -w "$BENCH_MODEL" || echo "$BENCH_MODEL" )" \
+            -ngl "$ngl" \
+            -t 4 \
+            -b 2048 \
+            -ub 512 \
+            -fa auto \
+            -ctk q8_0 \
+            -ctv q8_0 \
+            -p "$pp" \
+            -n "$tg" \
+            -r "$reps" \
+            -o md \
             --progress
         ;;
 
