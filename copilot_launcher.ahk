@@ -10,7 +10,7 @@
         Run 'cmd.exe /c start http://127.0.0.1:8080'
         return
     }
-    Run 'cmd.exe /k wsl.exe -i -c "cd /d/llamacpp-bXXXXX/localhost && ./llamacpp.sh"', 'D:\llamacpp-b10250'
+    Run 'cmd.exe /k wsl.exe -i -c "cd /d/llamacpp-bXXXXX/localhost && ./llamacpp.sh"', 'D:\llamacpp-bXXXXX'
     Sleep 10000
     Run 'cmd.exe /c start http://127.0.0.1:8080'
 }
