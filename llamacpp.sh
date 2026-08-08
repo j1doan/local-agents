@@ -5,11 +5,11 @@
 ### cd /c -> /d if models are stored on another drive
 case "$(uname -r)" in
     *microsoft*|*Microsoft*)
-        WIN_ROOT="/mnt/c"
+        WIN_ROOT="/mnt/d"
         USE_WSL=1
         ;;
     *)
-        WIN_ROOT="/c"
+        WIN_ROOT="/d"
         USE_WSL=0
         ;;
 esac
@@ -35,6 +35,9 @@ SERVER_ARGS=(
     --prio 2
     --models-max 2
     --models-preset "$WIN_PRESETS_FILE"
+    --spec-type draft-mtp
+    --spec-draft-n-max 3
+
 )
 
 TOOL_SYSTEM_PROMPT="You are a helpful assistant. You have access to tools — use them whenever relevant to the user's request. Always call a tool if one matches the task. Do not claim you cannot use tools. When a tool call is needed, respond ONLY with the tool call, no extra text before or after."
@@ -95,7 +98,7 @@ case "$choice" in
         ;;
 
     2)
-        mapfile -t GGUF_FILES < <(find "$MODELS_DIR" -maxdepth 1 -name '*.gguf' -printf '%f\n' 2>/dev/null | sort)
+        mapfile -t GGUF_FILES < <(find "$MODELS_DIR" -name '*.gguf' 2>/dev/null | sort)
         if [[ ${#GGUF_FILES[@]} -eq 0 ]]; then
             echo "No GGUF files found in $MODELS_DIR"
             exit 1
@@ -104,14 +107,14 @@ case "$choice" in
         echo "Available GGUFs:"
         echo
         for i in "${!GGUF_FILES[@]}"; do
-            size=$(du -h "$MODELS_DIR/${GGUF_FILES[$i]}" | cut -f1)
-            printf "  %2d) %-60s %s\n" $((i + 1)) "${GGUF_FILES[$i]}" "$size"
+            size=$(du -h "${GGUF_FILES[$i]}" | cut -f1)
+            printf "  %2d) %-60s %s\n" $((i + 1)) "$(basename "${GGUF_FILES[$i]}")" "$size"
         done
         echo
 
         read -rp "Select model (1-${#GGUF_FILES[@]}): " idx
         [[ "$idx" =~ ^[0-9]+$ && idx -ge 1 && idx -le ${#GGUF_FILES[@]} ]] || { echo "Invalid selection."; exit 1; }
-        BENCH_MODEL="$WIN_MODELS_DIR/${GGUF_FILES[$((idx - 1))]}"
+        BENCH_MODEL="${GGUF_FILES[$((idx - 1))]}"
 
         echo
         read -rp "GPU layers (0=CPU only, 999=all): " ngl
@@ -128,18 +131,18 @@ case "$choice" in
         echo "  ngl=$ngl  pp=$pp  tg=$tg  reps=$reps"
         echo
         ./llama-bench.exe \
-            -m "$BENCH_MODEL" \
-            -ngl "$ngl" \
-            -t 4 \
-            -b 2048 \
-            -ub 512 \
-            -fa auto \
-            -ctk q8_0 \
-            -ctv q8_0 \
-            -p "$pp" \
-            -n "$tg" \
-            -r "$reps" \
-            -o md \
+            --model "$( [ "$USE_WSL" -eq 1 ] && wslpath -w "$BENCH_MODEL" || echo "$BENCH_MODEL" )" \
+            --ngl "$ngl" \
+            --threads 4 \
+            --batch-size 2048 \
+            --ubatch-size 512 \
+            --flash-attn auto \
+            --cache-type-k q8_0 \
+            --cache-type-v q8_0 \
+            --prompt "$pp" \
+            --generate-tokens "$tg" \
+            --repetitions "$reps" \
+            --output md \
             --progress
         ;;
 
